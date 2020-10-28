@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+// web API 数据结构
+
+package web_api;
+
+// ErrorCode
+enum ErrorCode {
+  None = 0; // 占位
+
+  // 系统错误
+  Ok = 1; // OK
+  Error = 2; // 未知错误
+  Timeout = 3; // 超时
+  ParamError = 4; // 参数错误
+  NoServer = 5; // 没找到Server
+  NoCommand = 6; // 没有找到命令
+  NoUser = 7; // 没有这个用户
+  Forbidden = 8; //禁止
+
+  //功能错误
+}
+
+// CommonResult 通用返回值
+message CommonResult {
+  ErrorCode Code = 1; // 错误码
+  string Desc = 2; // 描述
+  string Data = 3; // 数据
+}
+
+// LoginToken 登陆令牌
+message LoginToken {
+  string osdk_game_id = 1; // SuperSDK分配的游戏编号
+  string user_id = 2; // 3rd Server返回的用户唯一标识
+  string login_sdk_name = 3; // 第三方联运商名称
+  string account_system_id = 4; // 用户账号系统编号（用户体系按联运平台划分，每个联运平台一个用户帐号系统编号，具体编号可以参考付3：用户帐号系统编号列表）
+  string osdk_user_id = 5; // oneskd用户编号,格式：osdk_user_id= account_system_id+_+user_id
+  string channel_id = 6; // 渠道编号扩展参数，在打包工具中配置的扩展参数玩家支付的总金额，单位 元
+  string extend = 7; // 扩展参数，在打包工具中配置的扩展参数
+  int64 time = 8; // App客户端充值时传入的游戏服编号
+  string ip = 9; // 客户端请求的ip地址
+  string country = 10; // 国家
+  string sign = 11; // sign生成的时间戳
+
+  string deviceType = 20; // 机型(同model)
+  string deviceOS = 21; // 操作系统（os）
+  string deviceID = 22; // 设备id(new_device_id)
+  string bundleID = 23; // 分包ID(package_name)
+  string region = 24; // 地区
+  string language = 25; // language
+  string gameVer = 26; // 客户端版本
+  string opId = 27; // 运营商
+  string yzDeviceId = 28; // 游族设备ID
+  string oaId = 29; // 国内安卓联盟设备ID
+}
+
+// ServerConfig 服务器配置
+message ServerConfig {
+  uint64 serverId = 1;
+  string serverName = 2;
+  string serverKey = 3;
+  int64 firstOpenTime = 4;
+  string ip = 5;
+  int64 maintainBeginTime = 6;
+  int64 maintainEndTime = 7;
+  int32 opgameId = 8;
+
+  int32 debug = 11; // 是否开启debug模式
+  int32 isQA = 12;
+  string grpcPort = 13;
+  int32 status = 14; //状态
+  int32 maxOnline = 15; // 最大在线人数
+  int32 maxUser = 18; // 最大注册用户数
+
+  int32 available = 30; // 是否启用
+  string param = 31; // 启动参数
+  int32 needActivation = 32; // 启动参数
+}
+
+// ServerState 服务器状态(注册到etcd的json)
+message ServerState {
+  uint64 serverId = 1; //服务器id
+  string ip = 2; // 服务器地址
+  int64 launchTime = 3; // 启动时间
+  string version = 4; // Version
+  string dir = 5;
+  string commitId = 6;
+  map<string,string> data = 10; // Data
+}
+
+
+/*
+const (
+    cfgTypeBlackIP   = "black_ip"   // IP黑名单
+    cfgTypeWhiteIP   = "white_ip"   // IP白名单
+    cfgTypeBlackUser = "black_user" // 角色黑名单
+    cfgTypeWhiteUser = "white_user" // 账号白名单
+    cfgTypeMaintain  = "maintian"   // 维护时间
+)
+*/
+
+//CfgBlackIP 黑名单IP
+//[]string
+
+//CfgWhiteIP 白名单IP
+//[]string
+
+//CfgBlackUser 黑名单角色ID
+//[]string
+
+//CfgWhiteUser 白名单账号
+//[]string
+
+//CfgWhiteDevice 白名单设备
+message CfgWhiteDevice {
+  repeated string account = 1;
+  int32 use = 2; //是否开启 0：不开启 1:开启
+}
+

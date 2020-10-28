@@ -1,0 +1,17 @@
+
+
+//----------------------------------------------------邮件
+//获取邮件列表
+CL cl.SC_LoadMails LoadMails(cl.PlaceHolder in) = 20300
+
+//读取邮件
+CL cl.SC_ReadMail ReadMail(cl.CS_MailId in) = 20301
+
+//一键领取（有附件的，并把有附件的标记已读）
+CL cl.SC_FastGetMailsAttachment FastGetMailsAttachments(cl.CS_FastGetMailsAttachment in) = 20303
+
+// 通知新邮件
+LC void NotifyNewMail(cl.S_NotifyNewMail in) = 20304
+
+//一键删除（已读，且没有附件的）
+CL cl.SC_FastDeleteMails FastDeleteMails(cl.CS_FastDeleteMails in) = 20306

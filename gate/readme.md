@@ -1,0 +1,3 @@
+调试的gateway
+支持tcp和websocket
+目前是单线程，用于研发环境
