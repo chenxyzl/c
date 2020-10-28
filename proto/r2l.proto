@@ -1,0 +1,282 @@
+syntax = "proto3";
+
+import "db_data.proto";
+import "common.proto";
+
+//redis <-> logic
+
+package r2l;
+
+enum RET {
+  RET_ERROR = 0;
+  RET_OK = 1;
+}
+
+enum ID {
+  MSG_NONE = 0;
+  MSG_MIN = 60000;
+  MSG_MAX = 70000;
+
+  MSG_BEGIN = 60001;
+
+  Login = 60002;
+  Create = 60004;
+  SaveUser = 60006;
+  Load = 60007;
+  LoadUserDB = 60011;
+  Command = 60012;
+  LoadMultiUserDB = 60013;
+  LoadUserSimpleDB = 60015;
+
+  LoadData = 61000;
+  SaveData = 61002;
+  DeleteData = 61004;
+
+  SetNewName = 62000;
+
+  SaveRank = 62009;
+  LoadHashData = 62010;
+  SaveHashData = 62011;
+  DeleteHashData = 62012;
+  SaveHashDataInt = 62013;
+  SaveHashDataUint64Bytes = 62014;
+
+  LoadKeys = 63000;
+  LoadMultiData = 63002;
+
+  LoadSortedSetRange = 64001;
+
+  LoadSortedSetMembersRank = 64003;
+
+  SaveSortedSetMembersScore = 64005;
+
+  AddFriend = 64100;
+  
+
+  MSG_END = 69999;
+}
+
+message L2R_Login {
+  string uuid = 1;
+  uint64 server_id = 2;
+  bool login = 3;
+
+  string deviceId = 10;
+}
+
+message R2L_Login {
+  uint32 ret = 1;
+  db_data.User user = 2;
+  bool newUser = 3; // 是否新用户自动创建的角色
+  bool login = 4;
+
+  string deviceId = 10;
+}
+
+message L2R_Create {
+  db_data.User user = 8;
+}
+
+message R2L_Create {
+  uint32 ret = 1;
+  db_data.User user = 2;
+}
+
+message L2R_SaveUser {
+  uint64 id = 1;
+  string account = 2;
+  string name = 3;
+  repeated bytes buffer = 8;
+}
+
+//同步加载数据库数据
+message L2R_Command {
+  repeated string cmd = 1; //键值
+}
+
+//同步加载数据库数据返回
+message R2L_Command {
+  string error = 1; //键值
+  string result = 2; //数据
+}
+
+//加载用户数据
+message L2R_LoadUserDB {
+  string name = 1; //按用户名查找，如果名字为空就按id查找
+  uint64 id = 2; //按用户id查找
+  string account = 3; // 按账户查找
+  uint64 serverId = 4;
+}
+
+//加载用户数据返回值
+message R2L_LoadUserDB {
+  db_data.User user = 1;
+}
+
+//加载用户简单数据
+message L2R_LoadMultiUserDB {
+  repeated uint64 id = 1; //按用户id查找
+}
+
+//加载多个用户数据返回值
+message R2L_LoadMultiUserDB {
+  repeated db_data.User user = 1;
+}
+
+//加载用户简单数据
+message L2R_LoadUserSimpleDB {
+  repeated uint64 id = 1; //按用户id查找
+}
+
+//加载用户简单数据返回值
+message R2L_LoadUserSimpleDB {
+  repeated common.PlayerSimpleData data = 1;
+}
+
+//同步加载数据库数据
+message L2R_LoadData {
+  string key = 1; //键值
+}
+
+//同步加载数据库数据返回
+message R2L_LoadData {
+  string key = 1; //键值
+  bytes data = 2; //数据
+}
+
+//删除数据库数据
+message L2R_DeleteData {
+  string key = 1; //键值
+}
+
+//按键值保存数据库数据
+message L2R_SaveData {
+  string key = 1; //键值
+  bytes data = 2; //数据
+}
+
+//设置新名字
+message L2R_SetNewName {
+  int32 sn = 1; //消息序列id，回传给客户端用
+  uint64 uid = 2; // user id
+  string oldName = 3; //老名字
+  string newName = 4; //新名字
+  common.Item item = 5; //扣除得道具
+}
+
+//设置新名字回复
+message R2L_SetNewName {
+  int32 sn = 1; //消息序列id，回传给客户端用
+  uint32 ret = 2;
+  uint64 uid = 3; //user id
+  string newName = 4; //新名字
+  common.Item item = 5; //扣除得道具
+}
+
+// 保存排行榜数据
+message L2R_SaveRankData {
+  string Name = 1;
+  repeated db_data.RankItemData Items = 2;
+  repeated string DeleteItems = 3;
+}
+
+// 加载哈希值
+message L2R_LoadHashData {
+  string key = 1;
+  repeated string fields = 2;
+}
+// 加载哈希值返回
+message R2L_LoadHashData {
+  repeated bytes items = 1;
+}
+
+// 保存哈希值
+message L2R_SaveHashData {
+  string key = 1;
+  map<string, bytes> data = 2;
+}
+
+//阐述hash对应的key和多个field
+message L2R_DeleteHashData {
+  string key = 1;
+  repeated string fields = 2;
+}
+
+// 保存哈希值
+message L2R_SaveHashUint64ByteData {
+  string key = 1;
+  map<uint64, bytes> data = 3;
+}
+
+// 保存哈希值
+message L2R_SaveHashIntData {
+  string key = 1;
+  map<uint64, uint32> dataInt = 3;
+  map<uint64, bytes> deleteInt = 4; // 删除的key
+}
+
+//同步加载数据库数据
+message L2R_LoadKeys {
+  string key = 1; //键值
+}
+
+//同步加载数据库数据返回
+message R2L_LoadKeys {
+  repeated string keys = 1; //键值
+}
+
+//同步加载数据库数据
+message L2R_LoadMultiData {
+  repeated string keys = 1; //键值
+}
+
+//同步加载数据库数据返回
+message R2L_LoadMultiData {
+  repeated bytes data = 1; //数据
+
+}
+
+// LoadSortedSetRange 加载范围
+message L2R_LoadSortedSetRange {
+  string key = 1;
+  int32 begin = 2; //
+  int32 end = 3; //
+}
+
+// LoadSortedSetRange 加载范围
+message R2L_LoadSortedSetRange {
+  repeated uint64 ids = 1; //
+  repeated uint32 scores = 2; //
+}
+
+//加载SortedSet多个members的rank
+message L2R_LoadSortedSetMembersRank {
+  string key = 1;
+  repeated uint64 ids = 2;
+}
+
+//加载SortedSet多个members的rank返回值
+message R2L_LoadSortedSetMembersRank {
+  repeated uint32 ranks = 1;
+}
+
+//保存SortedSet多个members的score
+message L2R_SaveSortedSetMembersScore {
+  string key = 1;
+  repeated uint64 ids = 2; //按用户id查找
+  repeated uint32 scores = 3; //
+}
+
+//保存SortedSet多个members的score并返回rank
+message R2L_SaveSortedSetMembersScore {
+  // repeated uint32 ranks   = 1;  
+}
+
+// 申请添加好友
+message L2R_RequestAddFriend {
+  uint64 id = 1;
+  repeated uint64 addIds = 2; //添加ids
+}
+
+// 申请添加好友
+message R2L_ResponseAddFriend {}

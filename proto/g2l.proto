@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package g2l;
+
+enum ID {
+  MSG_NONE = 0;
+  MSG_MIN = 10000;
+  MSG_MAX = 30000;
+  MSG_BEGIN = 20001;
+  MSG_END = 29999;
+}

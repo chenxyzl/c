@@ -1,0 +1,626 @@
+syntax = "proto3";
+
+// gm API 数据结构
+
+package gm;
+
+//物品
+message Item {
+  int32 id = 1;
+  uint32 count = 2;
+  int32 type = 3; //只在道具查询时候用
+  string name = 4;
+}
+
+//修改新手引导
+message ReqSetGuide {
+  uint32 sendType = 1; //1:id查询 2:名字查询 3:平台id查询
+  string value = 2; //查询内容
+  int32 newGuideId = 3; //引导id
+}
+
+message RspSetGuide {
+  int32 nowGuideId = 1; //引导id
+}
+
+//背包查询
+message ReqBagSearch {
+  uint32 searchType = 1; //1:id查询 2:名字查询
+  string searchValue = 2; //查询内容
+}
+
+message RspBagSearch {
+  repeated Item items = 1;
+  UserInfo userInfo = 2;
+}
+
+// 修改道具
+message ReqModifyItem {
+  string userId = 1;
+  uint32 beforeCount = 2;
+  Item modifyItem = 3;
+}
+
+message RspModifyItem {
+  UserInfo userInfo = 1;
+  repeated Item items = 2;
+}
+
+message OnlineUser {
+  string account = 1; // 账号
+  string id = 2; // id
+  string name = 3; // 名字
+  uint32 level = 4; // 等级
+  int64 loginTime = 5; // 登录时间
+  uint32 rechargeRMB = 6; // 累计充值金额
+}
+
+// 在线玩家
+message ReqOnlineUsers {
+
+}
+
+message RspOnlineUsers {
+  repeated OnlineUser onlineUsers = 1;
+  uint32 totalOnlineNum = 2;
+}
+
+// 宝物查询
+message ReqSearchTreasures {
+  uint32 searchType = 1; // 1:id查询 2:名字查询 3:账号查询
+  string searchValue = 2; // 查询内容
+}
+
+message RspSearchTreasures {
+  repeated Treasure treasures = 1;
+  UserInfo userInfo = 2;
+}
+
+
+// 主将查询
+message ReqSearchCommander {
+  uint32 searchType = 1; // 1:id查询 2:名字查询 3:账号查询
+  string searchValue = 2; // 查询内容
+}
+
+message RspSearchCommander {
+  repeated Commander commanders = 1;
+  UserInfo userInfo = 2;
+}
+
+message Treasure {
+  int32 id = 1;
+  uint32 level = 2;
+  bool isAwake = 3;
+  string name = 4;
+  int32 quality = 5;
+}
+
+//技能别聊
+message CommanderSkill {
+   uint32 skillSlotId = 1; //技能插槽id，对应1，2，3，4
+   uint32 level = 2; //技能等级 无解锁为0
+   uint32 exp = 3; //技能当前经验  无解锁为 0
+}
+
+message CommanderEquip {
+   uint32 equipSlotId = 1; //装备插槽id
+   bool synthetical = 2; //是否已经合成
+}
+message Commander {
+  int32 id = 1; //武将id
+  //养成数据
+  uint32 level = 2; //等级
+  uint32 quality = 3; //品级
+  uint32 starLevel = 4; //星级
+  uint32 littleStarLevel = 5; //当前小星等级
+  uint32 leadershipLevel = 6; //统率能力等级
+  int32 soldierId = 7; //携带的兵团ID -1无兵团ID
+  string soldierName = 8; //携带的兵团ID -1无兵团ID
+  uint32 genius = 9; //天赋阶段
+  repeated CommanderSkill skills = 10; //技能
+  repeated CommanderEquip equips = 11; //装备
+  //纯显示
+  string name = 20; //武将名字
+  uint32 zz = 21; //资质
+  string qualityDes = 22; //品质的描述
+}
+
+
+message UserInfo {
+  string name = 1; // 名字
+  uint64 id = 2; // id
+  string account = 3; // 账号
+  uint32 lv = 4; // 等级
+  uint32 vipLv = 5; // vip等级
+  uint32 vipExp = 6; // vip经验
+  uint32 diamond = 7; // 钻石
+  uint32 freeDiamond = 8; // 免费钻石
+  uint32 power = 9; // 战斗力
+  int64 createTime = 10; // 创角时间
+  int64 lastLogin = 11; // 上一次登录时间
+  int64 lastLogout = 12; // 上一次登出时间
+  string deviceId = 13; // 设备
+  string opId = 14; // 运营商
+  uint64 guildId = 15; // 帮会id
+  int32 guideId = 16; // 新手引导id
+  int32 privilege = 17; // 特权
+  uint32 commanderExp = 18; // 军功
+  uint32 gold = 19; // 银币
+  uint32 magicBook = 20; // 兵法心要
+  uint32 payDiamond = 21; // 付费钻石
+  uint32 rechargeRMB = 22; // 累计充值金额
+  int64 lastRechargeTime = 23; // 上次充值时间
+}
+
+// 查询玩家
+message ReqSearchUser {
+  uint32 sendType = 1; // 1:玩家id 2:玩家名字 3:玩家账号
+  string value = 2; // 查询内容
+}
+
+message RspSearchUser {
+  UserInfo userInfo = 1;
+}
+
+//禁言/解禁言玩家
+//Req ReqForbidChat
+//Rsp RspForbidChat
+message ReqForbidChat {
+  uint64 uid = 1; //
+  uint32 op_type = 2; //操作类型1:禁言2:解除禁言
+  uint32 channel = 3; // 频道
+  int64 endTime = 4; //持续时间，单位分钟
+  string reason = 5; //原因
+}
+message RspForbidChat {
+}
+
+//搜索玩家
+//Req ReqUserBanState
+//Rsp RspUserBanState
+message ReqUserBanInfo {
+  string searchType = 1; // 1:id查询 2:名字查询
+  string searchValue = 2; // 查询内容
+}
+
+message ForbidChat {
+  uint32 op_type = 1; //操作类型1:禁言2:解除禁言
+  uint32 channel = 2; //频道
+  uint32 start_time = 3; //开始时间
+  uint32 duration = 4; //持续多久
+  string reason = 5; //禁言原因
+}
+
+message RspUserBanInfo {
+  uint64 uid = 1; //角色id
+  string name = 2; //角色名
+  bool forbid_user_id = 3; //是否是封禁id
+  repeated ForbidChat forbid_chats = 4; //禁言信息
+}
+enum MailConditionType {
+  unknown = 0;
+  lv = 1;
+  vip = 2;
+  createRoleTime = 3;
+}
+message MailCondition {
+  MailConditionType cType = 1; // 1:等级 2:vip 3:创角时间
+  uint32 min = 2; //条件的最小值
+  uint32 max = 3; //条件的最大值
+}
+
+//邮件
+//Req ReqSendMail
+//Rsp RspSendMail
+message ReqSendMail {
+  //定时发送相关
+  uint32 id = 1; //邮件id（全局定时邮件才有 -> gm生成的唯一id，游戏服务器不能直接使用）
+  bool timed = 2; //是否定时邮件（全局定时邮件才有）
+  uint32 timedValue = 3; //定时时间（全局定时邮件才有）
+
+  int32 sendType = 4; //1:uid 2:条件
+  uint64 uid = 5; //uid
+  repeated MailCondition conditions = 6; //条件
+  string from = 7; //来自
+  string title = 8; //标题
+  string content = 9; //内容
+  repeated Item items = 10; //物品
+}
+message RspSendMail {
+
+}
+
+enum MailSendType {
+  uid = 0; //uid发送
+  condition = 1; //条件发送
+}
+
+//踢下线
+//Req ReqKickOut
+//Rsp RspKickOut
+message ReqKickOut {
+  uint64 uid = 1;
+}
+message RspKickOut {
+}
+
+// 更改名字
+message ReqRename {
+  uint64 uid = 1;
+  string name = 2;
+}
+
+message RspRename {}
+
+
+message PlayerHeadPortrait {
+  string name = 1; //名字
+  uint32 level = 2; //等级
+  int32 avatar = 3; //头像
+  int32 avatarFrame = 4; //头像框
+  uint32 vipLv = 5; //vip等级
+  uint64 uid = 6; //角色id
+}
+message GuildPlayer {
+  uint64 uid = 1;
+  string name = 2; //名字
+  uint32 level = 3; //等级
+  uint32 vipLv = 4; //vip等级
+  uint32 power = 5; //战斗力
+  int64 lastLogout = 6; //下线时间
+  string officialName = 7; //官职名称
+  uint64 dayContribution = 8; //今日贡献
+  //  uint64 weekContribution = 9; //周贡献
+  uint64 totalContribution = 10; //总贡献
+}
+
+message GuildBuilding {
+  int32  id = 1;
+  uint32 lv = 2;
+  uint32 exp = 3;
+  string name = 4;
+}
+message GuildInfo {
+  uint64 guildId = 1;
+  string guildName = 2;
+  uint64 presidentId = 5;
+  string presidentName = 6;
+  repeated GuildPlayer members = 14; //成员
+  uint64 totalPower = 19; //总战斗力
+  uint64 qq = 20; //qq号/微信号
+  repeated GuildBuilding buildings = 23; //建筑信息
+  uint32 todayTotalBuildPeopleCount = 24; //今日建造次数
+  uint32 todayTotalActivity = 25; //今日活跃度
+}
+
+// 请求联盟数据
+message ReqGuildInfo {
+  uint64 guildId = 1;
+}
+
+message RspGuildInfo {
+  uint64 guildId = 1;
+  string guildName = 2;
+}
+
+
+// 请求联盟数据
+message ReqGuildList {
+  uint32 page = 1;
+}
+//请求联盟列表
+message RspGuildList {
+  repeated GuildInfo guildList = 1;
+}
+
+// 联盟改名
+message ReqGuildRename {
+  uint64 guildId = 1;
+  string newName = 2;
+}
+
+message RspGuildRename {
+
+}
+
+message ReqGuildChangeNotice {
+  uint64 guildId = 1;
+  int32 noticeType = 2; // 1宣言 2公告
+  string noticeMsg = 3; // 公告信息
+}
+
+message RspGuildChangeNotice {
+}
+
+//删除道具
+//ReqDeleteUserItem
+//RsqDeleteUserItem
+message ReqDeleteUserItem {
+  uint64 uid = 1;
+  repeated Item items = 2;
+}
+message RsqDeleteUserItem {
+}
+
+//请求道具信息
+//ReqGetUserItemInfo
+//RsqGetUserItemInfo
+message ReqGetUserItemInfo {
+  uint64 uid = 1;
+}
+//道具信息
+//返回类型：
+//碎片、武将、资源、时装、包裹道具
+message RsqGetUserItemInfo {
+  repeated Item items = 2;
+}
+
+//公告
+//Req ReqPubAnnounce
+//Rsp RspPubAnnounce
+message ReqPubAnnounce {
+  repeated Announce announces = 1;
+}
+message RspPubAnnounce {
+}
+
+// gm公告发布状态
+enum AnnounceStatus{
+  Unpublished = 0; // 未发布
+  Published = 1; // 已发布
+}
+
+//单条公告
+message GMAnnounce {
+  uint64 id = 1;
+  uint32 startTm = 2;
+  uint32 endTm = 3;
+  uint32 frequence = 4;
+  string content = 5;
+  repeated uint64 selectServerList = 6;
+  AnnounceStatus status = 7;
+}
+
+//单条公告
+message Announce {
+  uint64 id = 1;
+  uint32 begin = 2;
+  uint32 end = 3;
+  uint32 frequent = 4;
+  string announcement = 5;
+}
+
+//问卷
+//Req ReqPubQuestionnaireInfo
+//Rsp RspPubQuestionnaireInfo
+message ReqPubQuestionnaireInfo {
+  repeated QuestionnaireInfo questionnaireInfos = 1;
+  repeated uint64 deletes = 2;
+}
+message RspPubQuestionnaireInfo {
+}
+//单条问卷信息
+message QuestionnaireInfo {
+  uint64 id = 1; //问卷id
+  uint32 type = 2; //问卷类型
+  string content = 3; //问卷内容(url)
+  string remark = 4; //备注
+  uint32 start_time = 5; //开始时间
+  uint32 finish_time = 6; //结束时间
+  uint32 min_level = 7; //最小等级
+  uint32 max_level = 8; //最高等级
+  uint32 min_vip = 9; //最小vip
+  uint32 max_vip = 10; //最大vip
+  uint32 create_time = 11; //创建时间
+  repeated Item items = 12; //物品
+}
+
+//可配置活动
+//ReqCustomActivity
+//RspCustomActivity
+message ReqCustomActivity {
+  repeated CustomActivity updates = 1;
+  repeated uint32 deletes = 2;
+}
+message RspCustomActivity {
+}
+
+//可配置活动信息
+message CustomActivity {
+  uint32 id = 1; //活动Id
+  uint32 area = 2; //活动所在区域
+  uint32 acType = 3; //活动模板类型
+  uint32 seType = 4; //活动模板类型
+  uint32 startTimeType = 5; //活动开启时间形式
+  uint64 startTime = 6; //开启时间
+  uint64 endTime = 7; //结束时间
+  uint64 appearTime = 8; //展示时间
+  uint64 disappearTime = 9; //消失时间
+  uint32 levelVis = 10; //等级可见
+  uint32 vipVis = 11; //VIP可见
+  uint32 serverLimit = 12; //开服时间限制
+  uint32 playerLimit = 13; //创角时间限制
+  uint32 reissue = 14; //补发奖励
+  uint32 IsOpen = 15; // 是否开启
+}
+
+//单个订单
+message Recharge {
+  string order_id = 1; //订单号
+  string coo_order_id = 2; //外部订单号
+  string product_id = 3; //商品id
+  string uuid = 4; //玩家账号
+  string sdk_ex = 5; //sdk额外参数
+  uint64 sid = 6; //服务器id
+  uint32 opid = 7; //运营商
+  uint32 gid = 8; //game id
+  uint32 charge_time = 9; //充值时间
+  uint32 money = 10; //充值金额
+  uint32 true_sid = 11; //内部服务器id
+}
+
+//获取排行榜
+//ReqGetRankInfo
+//RspGetRankInfo
+message ReqGetRankInfo {
+  int32 rankType = 1; //排行榜类型
+  uint32 begin = 2; //开启排名
+  uint32 count = 3; //数量最大100
+}
+
+message RankTitle {
+  string title = 1; //标题
+  string key = 2; //值得的变量名 对应RankValue的key就行
+}
+message RankValue {
+  string key = 1; //值得变量名 对应RankTitle的key就行Va
+  string value = 2; //值
+}
+message RankRow {
+  repeated RankValue values = 1;
+}
+
+message RspGetRankInfo {
+  repeated RankTitle titles = 1; //标题
+  repeated RankRow rows = 2; //排行榜数据
+}
+
+message ReqGmCommand {
+  string cmd = 1;
+  string content = 2;
+}
+message RspGmCommand {
+  int32 code = 1;
+  string desc = 2;
+  string data = 3;
+}
+
+// 服务器操作类型
+enum ServerOptType {
+  reloadTable = 0; //重载表格
+  closeServer = 1; //关服
+  flushData = 2; // 清档
+  kickall = 3; // 全部踢下线(让其重新登陆)
+}
+
+message ReqServerOptCommand {
+  ServerOptType opt = 1;
+}
+
+message RspServerOptCommand {
+}
+
+// ReqPlayerRollbackCommand 单人回档
+message ReqPlayerRollbackCommand {
+  
+  bytes data = 10;
+}
+
+message RspPlayerRollbackCommand {
+  UserInfo User = 1;  
+}
+
+message GMOrderData {
+  string order = 1; // 订单id
+  string productId = 2; // 商品id
+  string productName = 3; // 商品名字
+  float money = 4; // 钱数
+  int64 payTime = 5; // 支付时间
+  int64 orderTime = 6; // 订单到账时间
+  bool isReal = 7; // 是否是真实订单
+  uint32 addDiamond = 8; // 添加的钻石
+  uint32 currentDiamond = 9; // 当前钻石
+}
+
+// ReqSearchUserOrders 单人回档
+message ReqSearchUserOrders {
+  string id = 1; // id
+}
+
+message RspSearchUserOrders {
+  string name = 1; // 名字
+  string id = 2; // id
+  string account = 3; // 账号
+  repeated GMOrderData list = 4;
+}
+
+// 玩家信息
+enum UserDetailType {
+  DetailCounsellor = 0; // 军师
+  DetailFormation = 1; // 布阵
+  DetailSoldier = 2; // 士兵
+}
+message ReqUserDetail {
+  uint64 userId = 1; // 玩家id
+  UserDetailType type = 2; // 类型
+  int32 formationType = 3; // 布阵类型
+}
+message RespUserDetail {
+  repeated Counsellor counsellors = 1;
+  repeated Formation formations = 2;
+  repeated Soldier soldiers = 3;
+}
+
+message Counsellor {
+  int32 id = 1;
+  uint32 star = 2; // 星
+  string name = 3; // 名字
+  repeated CounsellorMagic magics = 4; // 法术
+  uint32 power = 5; // 战斗力
+  repeated CounsellorQiMen qiMen = 6; // 奇门
+  uint32 qiJi = 7; // 奇迹等级
+}
+
+// 军师法术
+message CounsellorMagic {
+  int32 id = 1; // 法术id
+  uint32 level = 2; // 阶数
+  uint32 progress = 3; // 进度
+}
+
+// 奇门
+message CounsellorQiMen {
+  int32 id = 1; // id
+  int32 level = 2; // 等级
+}
+
+//单个阵型数据
+message Formation {
+  int32 type = 1; //阵型类型
+  string counsellorName = 2; //军师
+  repeated Grid grids = 3; //格子
+}
+
+message Grid {
+  int32 id = 1;
+  string commanderName = 2;
+}
+
+message Soldier {
+  map<int32, int32> techLevels = 1;
+  map<uint32, string> soldiers = 2; // 士兵名字
+}
+
+// 风控平台，查询玩家数据
+message ReqUserDataMonitor {
+  uint64 uid = 1; //
+}
+
+message RespUserDataMonitor {
+  uint64 sid = 1;
+  string opid = 2;
+  uint64 uid = 3;
+  string name = 4;
+  string account = 5;
+  uint32 level = 6;
+  uint64 unionId = 7;
+  string unionName = 8;
+  uint32 vipLevel = 9;
+  uint32 vipExp = 10;
+  uint32 diamond = 11;
+  uint32 power = 12;
+  int64 createTime = 13;
+	int64 lastLoginTime = 14;
+	int64 lastLogoutTime = 15;
+}

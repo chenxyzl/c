@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package log;
+
+//todolist
+//server_type 1:正式服，2:非正式服（包含各类测试服）。填数字，例如，'2'，代表正式服。 注意：在各类常规报表中，测试服数据不会被统计在内
+//createtime_local 行为发生时的当地时间
+//time_zone 服务器当地时区,文字格式，需严格参考，America/Los_Angeles，Asia/Chongqing等国际通用标准，大小写敏感
+//account_first_ingame_time 平台账号在该游戏首次注册时间（所有游戏服里，第一个角色的注册时间），从平台接口获取，10位Unix时间戳（秒），例如，1479960346
+//role_type 角色类型，标识角色的分类属性，1:正常 2:测试(不计入充值等统计） 3:GM/福利号 4：机器人 5：其它
+
+message Info {
+  uint64 timestamp = 1; //日志时间戳，单位秒 => timestamp
+  uint64 timestamp_index = 2; //timestamp * 1e9 + auto_increment_id(<1e9)
+  uint32 game_id = 3; //游戏ID，开服系统中的游戏ID => game_id
+  uint64 server_id = 4; // 服务器ID => server_id opgame_id 混服组ID，如不能直接获取，默认使用server_id前4位
+  uint64 op_id = 5; //游族统一运营商ID => op_id
+  uint64 event_id = 6; //事件id，根据事件类型，角色id，发生时间地点等来产生该id。例如两个人对战，处于同一事件，共用一个事件ID=> event_id
+  string account = 7; //玩家登录时用的平台账号，如游族平台账号，不需要加任何前缀 => account 
+  uint64 role_id = 8; //角色ID，应为全服唯一的ID => role_id
+  uint32 role_level = 9; //角色等级 => role_level
+  uint32 role_vip = 10; //角色vip等级，一般是充值获得的等级 => role_vip
+  uint64 role_power = 11; //战力，发送当前战力数，默认值0 => role_power
+  string client_ip = 12; //客户端IP，不需要服务端IP，不需要端口号 => client_ip
+  string role_name = 13; //玩家在当前服务器的的角色昵称 => role_name
+  uint32 role_regtime = 14; //平台账号在平台首次注册的时间，10位Unix时间戳（秒）=>role_regtime
+  uint32 role_paid = 15; //如果该角色从未付过费，发送值0；如果付过费，发送值1 => role_paid
+  uint32 log_type = 16; //日志类型，大类
+  uint32 log_sub_type = 17; //日志小类型，总共分两层，如果还有细分请使用param字段
+  uint64 pay_gold = 18; //充值元宝数量
+  uint64 gift_gold = 19; //赠送元宝数量
+  string param1 = 100;
+  string param2 = 101;
+  string param3 = 102;
+  string param4 = 103;
+  string param5 = 104;
+  string param6 = 105;
+  string param7 = 106;
+  string param8 = 107;
+  string param9 = 108;
+  string param10 = 109;
+  uint64 param11 = 110;
+  uint64 param12 = 111;
+  uint64 param13 = 112;
+  uint64 param14 = 113;
+  uint64 param15 = 114;
+  uint64 param16 = 115;
+  uint64 param17 = 116;
+  uint64 param18 = 117;
+  uint64 param19 = 118;
+  uint64 param20 = 119;
+  string extra_json = 120; //如果以上字段不足，建议以json形式存入该字段
+}

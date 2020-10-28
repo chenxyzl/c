@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+import "common.proto";
+package cm;
+
+//服务器类型
+enum ServerType {
+  Logic = 0;
+  Match = 1;
+}
+
+enum EventID {
+  LOAD_USER = 0; //load玩家
+  BEGIN_MATCH_PEAK = 1; //开始匹配
+  CANCEL_MATCH_PEAK = 2; //取消匹配
+  NOTIFY_MATCH_RESULT = 3; //通知匹配结果
+  NOTIFY_PEAK_READY = 4; //通知准备状态
+  NOTIFY_PEAK_FORMATION_ACTION = 5; //通知喊话
+  NOTIFY_PEAK_CHANGE_FORMATION = 6; //通知准备状态
+  NOTIFY_START_PEAK_BATTLE = 7; //通知改变布阵
+  NOTIFY_PEAK_BATTLE_RESULT = 8; //通知战斗结果
+}
+
+//标识服务器身份
+message ServerTopic {
+  string serverTypeName = 1;
+  uint64 serverId = 2;
+}
+
+//message Request {
+//  ServerTopic serverTopic = 1;
+//  repeated bytes data = 2;
+//}
+//
+//message Response {
+//  ServerTopic serverTopic = 1;
+//  repeated bytes data = 2;
+//}
+
+//message Notify {
+//  ServerTopic serverTopic = 1;
+//  EventID eventId = 2;
+//  repeated bytes data = 3;
+//}
+
+
+message CommonRet {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+message PeakMatchPlayer {
+  uint64 serverID = 1;
+  uint64 uid = 2; //玩家id
+  common.PlayerHeadPortrait icon = 3; //头像
+  uint32 score = 4; //积分
+  uint32 power = 5; //战斗力
+  uint32 maxPower = 6; //最大战斗力
+  int32 counsellorId = 7; //军师id
+  repeated common.Commander commanders = 8; //拥有的热点英雄
+  bool isRobot = 9; //是否机器人
+  common.BattlePlayerInfo battleData = 10; //战斗数据，用于减少rpc（机器人不需要再次获取。而且是大概率）
+  string ver = 200; // 战斗脚本版本
+}
+
+//
+message ReqBeginPeakMatch {
+  PeakMatchPlayer peakMatchPlayer = 1;
+  PeakMatchPlayer robotPeakMatchPlayer = 2;
+}
+message RspBeginPeakMatch {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+//
+message ReqCancelPeakMatch {
+  uint64 serverID = 1;
+  uint64 targetUid = 2;
+}
+message RspCancelPeakMatch {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+//
+message ReqPeakMatchResult {
+  int32 code = 1;
+  uint64 targetUid = 2;
+  uint64 battleID = 3;
+  int64 matchTime = 4;
+  repeated PeakMatchPlayer peakMatchPlayers = 5;
+}
+message RspPeakMatchResult {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+//通知准备状态
+message ReqPlayerReady {
+  uint64 serverID = 1;
+  uint64 battleID = 2;
+  uint64 targetUid = 3;
+  bool ready = 4;
+}
+message RspPlayerReady {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+message NotifyPlayerReady {
+  int32 code = 1;
+  uint64 battleID = 2;
+  uint64 targetUid = 3;
+  uint64 actionUid = 4;
+  bool ready = 5;
+}
+
+//通知布阵喊话
+message NotifyPeakFormationAction {
+  uint64 battleID = 1;
+  uint64 targetUid = 2;
+  uint64 actionUid = 3;
+  int32 actionID = 4;
+}
+
+//
+//请求改变布阵
+message ReqChangePeakFormation {
+  uint64 serverID = 1;
+  uint64 battleID = 2;
+  common.BattlePlayerInfo battlePlayerInfo = 3;
+}
+message RspChangePeakFormation {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}
+
+//通知开始游戏
+message NotifyBattleStart {
+  int32 code = 1;
+  uint64 battleID = 2;
+  uint64 targetUid = 3;
+  string address = 4;
+  string secret = 5;
+  int64 battleStartTime = 6;
+  common.BattleStartInfo info = 7; // 战斗开始数据
+}
+
+//通知游戏结果
+message NotifyBattleResult {
+  int32 code = 1;
+  uint64 battleID = 2;
+  uint64 targetUid = 3;
+  common.BattleResultInfo resultInfo = 4; // 战斗结束数据
+  common.BattleReplay replay = 5; //战斗回访数据
+  uint64 winUid = 6; // 胜利者的id
+  bool giveIn = 7; //是否是认输
+}
+
+
+//
+//请求改变布阵
+message ReqGiveInPeakBattle {
+  uint64 serverID = 1;
+  uint64 battleID = 2;
+  uint64 targetUid = 3;
+}
+message RspGiveInPeakBattle {
+  int32 code = 1; //不能用ret.proto。pb2和pb3的的proto生成问题
+}

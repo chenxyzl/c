@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package cmd;
+
+enum CMD {
+  //gm------------------------------------------------------------------//
+  GM_CMD_UNKNOWN = 0; //未知的
+  //  GM_CMD_XML_RELOAD = 1; //------以前没有实现
+  //  GM_CMD_DEBUG_FV = 2; //------以前没有实现
+  GM_CMD_SEARCH_USER = 3; // 查询玩家√
+  GM_CMD_FORBID_CHAT = 4; //禁言/解禁√
+  GM_CMD_KICK_OUT = 5; //踢下线√
+  //  GM_CMD_FORBID_UIDS = 6; //封号/解封 走etcd
+  //  GM_CMD_FORBID_IPS = 7; //封ip/解封ip 走etcd
+  GM_CMD_MAIL = 8; //邮件√
+  //  GM_CMD_SERVER_FORBID_INFO = 9; //获取所有封禁信息------以前没有实现
+  GM_CMD_CHAT_FORBID_INFO = 10; //查询单个玩家封禁信息√
+  //  GM_CMD_FORBID_INFO = 11; //获取封禁信息------以前没有实现
+  GM_CMD_ANNOUNCE = 12; //GM后台公告√
+  GM_CMD_RECHARGE = 13; //充值
+  GM_CMD_ACTIVITY = 14; //可配置活动信息√
+  GM_CMD_DELETE_USER_ITEM = 15; //删除道具√
+  //  GM_CMD_ROLLBACK = 16; //角色数据回滚------以前没有实现
+  GM_CMD_GET_USER_ITEM_INFO = 17; //请求道具信息√
+//  GM_CMD_UPDATE_QUESTIONNAIRE = 18; //发布问卷配置√
+  GM_CMD_GET_RANK = 19; //获取排名
+  GM_CMD_DEBUG_COMMAND = 20; //debug命令
+  GM_CMD_SERVER_OPT_COMMAND = 21; //服务器操作命令 0重加在表格，1关服，2关服并清档(会备份)
+  GM_CMD_SET_GUIDE = 22; // 修改新手引导
+  GM_CMD_BAG_SEARCH = 23; // 背包查询
+  GM_CMD_SEARCH_TREASURES = 24; // 宝物查询
+  GM_CMD_ONLINE_USERS = 25; // 在线玩家
+  GM_CMD_RENAME = 26; // 更改名字
+  GM_CMD_GUILD_INFO= 27; // 联盟数据
+  GM_CMD_GUILD_RENAME = 28; // 联盟改名
+  GM_CMD_GET_GUILD_LIST = 29; //获取联盟列表
+  GM_CMD_MODIFY_ITEM = 30; // 修改道具
+  GM_CMD_ROLLBACK_PLAYER_DB = 31; //单个玩家回档
+  GM_CMD_GUILD_NOTICE = 32; //修改联盟公告宣言
+  GM_CMD_SEARCH_ORDER = 33; //查询充值订单
+  GM_CMD_USER_DETAIL = 34; //玩家详细数据
+  GM_CMD_SEARCH_COMMANDER = 35; //查找武将
+  GM_CMD_USER_DATA_MONITOR = 36; //玩家数据
+  //web------------------------------------------------------------------//
+}
+
+// Code
+enum Code {
+  None = 0; // 占位
+  Ok = 1; // OK
+  Error = 2; // 未知错误
+}
+
+//Req
+//Rsp
+message GmRequest {
+
+  CMD cmd = 1; //命令id
+  bytes data = 2; //命令参数（pb格式的）
+  string user = 10; // 用户
+}
+
+message GmReplay {
+  Code ret = 1; //返回值 1代表ok
+  string desc = 2; //返回描述
+  bytes replay = 3; //返回的数据（pb格式的）
+}

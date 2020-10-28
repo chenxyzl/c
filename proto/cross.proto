@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package cross;
+
+//----------------------------------------------------------------------NATS
+
+//-----------------------------战斗验证服务器Battle
+// 请求战斗验证
+message RequestBattleResult {
+  uint64 battleID = 1;
+  common.BattleReplay data = 10;  
+}
+
+// 返回战斗验证
+message ResponseBattleResult {
+  uint64 battleID = 1;
+  common.BattleResultInfo data = 2;
+  string err = 10;
+}
+
+// 延迟请求战斗验证（对结果返回要求不实时，走kafka）
+message RequestDelayBattleResult {
+  uint64 serverID = 1; // serverID
+  uint64 playerID = 2; // id
+  int32 typeID = 3; // 类型ID
+  common.BattleReplay data = 10; // 战斗数据
+}
+
+// 延迟返回战斗验证
+message ResponseDelayBattleResult {
+  uint64 serverID = 1; // serverID
+  uint64 playerID = 2; // id
+  int32 typeID = 3; // 类型ID
+  common.BattleResultInfo data = 10;
+}
+
+//-----------------------------实时战斗服务器PVP
+
+// 创建结果枚举
+enum CreatePVPResultType {
+  Unknow = 0; //未知错误
+  Success = 1; //成功
+  Exist = 2; //战斗已经存在
+  ParamError = 3; //参数错误
+  ServerClosed = 5; //服务器正在关闭
+}
+
+// 创建PVP请求
+message RequestCreatePVP {
+  uint64 battleID = 1;
+  int32 typeID = 2;
+  repeated uint64 players = 3;
+  int32 randomSeed = 4;
+
+  string serverID = 10;
+}
+
+// 创建PVP回复消息
+message ResponseCreatePVP {
+
+  CreatePVPResultType ret = 1;
+  uint64 battleID = 2;
+  int64 createTime = 3;
+  string serverAddress = 4;
+  string secret = 5;
+}
+
+// 汇报战斗结果请求
+message NotifyPVPBattleResult {
+  uint64 battleID = 1;
+  map<uint64, uint64> winner = 2;
+  int64 totalTime = 3;
+  bytes data = 4;
+}
+
+// RequestSurrenderPVP 请求认输
+message RequestSurrenderPVP {
+  uint64 battleID = 1;
+  uint64 playerId = 2;
+  uint64 winnerId = 3;
+}
+
+// ResponseSurrenderPVP 回复认输
+message ResponseSurrenderPVP {
+  uint64 battleID = 1;
+  bool ret = 2;
+}
+//-----------------------------充值服务器Recharge
+// OrderInfo 充值请求
+message OrderInfo {
+  string order_id = 1; // superSDK订单号，OS_、DS_开头，某些情况下可能会有重复通知的情况出现，游戏方需要根据此字段去重，防止重复发放钻石
+  string coo_order_id = 2; // 第三方联运营商订单号
+  string user_id = 3; // 第三方联运商用户标识
+  int32 op_id = 4; // 联运平台编号，跟开服系统保护一致
+  string account_system_id = 5; // 用户账号体系编号（用户体系按联运平台划分，每个联运平台一个用户帐号系统编号；具体编号可以参考付3：用户帐号系统编号列表）
+  string osdk_user_id = 6; // 用户标识 格式：osdk_user_id=account_system_id+_+user_id
+  float amount = 7; // 玩家支付的总金额，单位 元
+  uint64 server_id = 8; // App客户端充值时传入的游戏服编号
+  string product_id = 9; // App客户端充值时传入的商品编号
+  string product_name = 10; // App客户端充值时传入的商品名称
+  int32 game_id = 11; // App客户端充值时传入的游戏编号
+  uint64 game_role_id = 12; // App客户端充值时传入的游戏角色编号
+  int32 pay_status = 13; // 对于游戏来说，无论此字段为何值都需要给玩家发方游戏通货(钻石、金币)，但当置为 0(json {"0": "虚拟支付", "1":"真实付款"}) 时，该笔订单将不会参与对账
+  int64 pay_time = 14; // 联运商通知过来的支付UNIX时间戳（从格林威治时间1970年01月01日00时00分00秒起至现在的总秒数
+  string channel_id = 15; // 渠道编号
+  string sdk_pay_extend = 16; // sdk客户端充值时传递的扩展参数
+  string custom_data = 17; // 渠道关联自定义参数
+}
+
+// RequestRecharge 请求充值
+message RequestRecharge {
+  OrderInfo order = 1; // 订单信息
+}
+
+// ResponseRecharge 返回充值请求
+message ResponseRecharge {
+  // 返回码
+  enum Code {
+    UnknownError = 0; // 未知错误
+    Ok = 1; // 成功
+    NoUser = 2; // 没有这个用户
+    Duplicate = 3; // 订单重复
+  }
+  Code code = 1;  // 返回码
+  string message = 2; // 信息
+}
+
+//问卷答题通知
+enum QuestionCode {
+  QuestionCode_ok = 0; // 成功
+  QuestionCode_paramEmpty = 1; // 必填参数为空
+  QuestionCode_repeatedIssuance = 2; // 重复发放
+  QuestionCode_issuanceFailed = 3; // 发放失败（用户不存在、问卷不存在等）
+  QuestionCode_signError = 4; // 签名错误
+  QuestionCode_otherError = 5; // 其它错误
+}
+message ReqQuestionnaireAnswer {
+  uint64 uid = 1;
+  uint64 qid = 2;
+}
+message RspQuestionnaireAnswer{
+  QuestionCode code = 1;  // 是否成功
+  string msg = 2; //
+}
+
+
+//礼包码使用
+enum GiftCode {
+  GiftCode_Ok = 0; // 发货成功
+  GiftCode_Fail = 1; // 发货失败
+  GiftCode_Repeat = 2; // 重复发货
+  GiftCode_UserNotExist = 3; // 玩家角色不存在
+  GiftCode_Other = 4; // 其它
+}
+message ReqGiftCodeUser {
+  uint64 uid = 1;
+  string oid = 2;
+  repeated common.Item items = 3;
+}
+message RspGiftCodeUser{
+  GiftCode code = 1;  // 是否成功
+  string msg = 2; //
+}
